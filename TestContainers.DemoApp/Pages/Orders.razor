@@ -1,0 +1,52 @@
+﻿@page "/orders/{userid?}"
+
+@using Microsoft.EntityFrameworkCore;
+@using TestContainers.Shared.Contexts
+@using TestContainers.Shared.Models
+
+@inject StoreContext storeContext
+
+<h1>Orders overview</h1>
+
+<PagedList ListQuery="orders">
+    <HeaderDisplay>
+        <tr>
+            <th>Email address</th>
+            <th>Order date</th>
+            <th>Description</th>
+            <th>Number of items</th>
+            <th>Item price</th>
+            <th>Total</th>
+        </tr>
+    </HeaderDisplay>
+    <ItemDisplay>
+        <tr>
+            <td>@context.User?.Email</td>
+            <td>@context.OrderDate</td>
+            <td>@context.Item?.Description</td>
+            <td>@context.NumberOfItems</td>
+            <td>@context.Item?.Price</td>
+            <td>@(context.Item?.Price * context.NumberOfItems)</td>
+        </tr>
+    </ItemDisplay>
+</PagedList>
+
+@code {
+    [Parameter]
+    public string? UserId { get; set; }
+
+    private IQueryable<Order>? orders;
+
+    protected override void OnInitialized()
+    {
+        orders = storeContext
+                .Orders
+                .Include(order => order.User)
+                .Include(order => order.Item);
+
+        if (UserId is not null && int.TryParse(UserId, out var result))
+        {
+            orders = orders.Where(order => order.UserId == result);
+        }
+    }
+}

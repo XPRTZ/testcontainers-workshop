@@ -1,0 +1,41 @@
+﻿@page "/accounts"
+
+@using TestContainers.Shared.Contexts
+@using TestContainers.Shared.Models
+@inject StoreContext storeContext
+
+<h1>Accounts overview</h1>
+
+<PagedList ListQuery="accounts">
+    <HeaderDisplay>
+        <tr>
+            <th></th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email address</th>
+            <th>Created on</th>
+            <th>Last login</th>
+        </tr>
+    </HeaderDisplay>
+    <ItemDisplay>
+        <tr>
+            <td><a href="accounts/edit/@(context.UserId)">Edit</a></td>
+            <td>@context.FirstName</td>
+            <td>@context.LastName</td>
+            <td>@context.Email</td>
+            <td>@context.CreatedOn</td>
+            <td>@context.LastLogin</td>
+            <td><a href="orders/@(context.UserId)">Order overview</a></td>
+        </tr>
+    </ItemDisplay>
+</PagedList>
+
+
+@code {
+    private IQueryable<Account>? accounts;
+
+    protected override void OnInitialized()
+    {
+        accounts = storeContext.Accounts;
+    }
+}
